@@ -22,6 +22,7 @@
     "web": "parcel index.html --public-url /dist",
     "build:web": "parcel build index.html --public-url /dist",
     "serve": "nodemon server.js",
+    "start": "node server.js",
     "test": "tape test/**/*.js | faucet"
   },
   "homepage": "https://github.com/LordEidi/fennel",
@@ -46,8 +47,6 @@
     "moment": "^2.15.1",
     "node-regexp": "^0.1.1",
     "pretty-data": "^0.40.0",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
     "sequelize": "^6.3.4",
     "shiro-trie": "^0.3.12",
     "sqlite3": "^4.2.0",
