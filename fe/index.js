@@ -1,10 +1,8 @@
-import React from 'react';
-import ReactDOM from "React-dom";
 import { Calendar } from '@fullcalendar/core';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import * as services from './service';
-import { appendCalendar, createNewEvent, getEvents } from './crud';
+import { createNewEvent, getEvents } from './crud';
 
 window.services = services;
 
