@@ -109,8 +109,8 @@ comm.prototype.flushResponse = function()
     }
 
     log.debug("Returning response: " + response);
-    this.res.write(response);
-    this.res.end();
+
+    this.res.end(response);
 };
 
 /**
@@ -189,7 +189,9 @@ comm.prototype.checkPermission = function(strURL, strMethod)
     // which means /my/url/ becomes my:url
     // that filter(String) hack makes sure that there are no empty elements,
     // like you get when splitting a / terminated URL...
-    var s = strURL.substr(1).split("/").filter(String).join(":") + ":" + strMethod.toLowerCase();
+
+    var s = strURL.substr(1).split("/").filter(String).join(":") + ":"+this.getUser().getUserName() +":" + strMethod.toLowerCase();
+    console.log('s: ', s);
 
     // have the shiro string checked against the authorisation set...
     var ret = this.authority.check(s);

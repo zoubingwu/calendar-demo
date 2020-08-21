@@ -41,6 +41,7 @@ function handlePrincipal(request)
             log.info("Request method is unknown: " + method);
             res.writeHead(500);
             res.write(method + " is not implemented yet");
+            res.end();
             break;
     }
 }
@@ -67,6 +68,10 @@ function handleCalendar(request)
             break;
 
         case 'MKCALENDAR':
+            cal.makeCalendar(request);
+            break;
+
+        case 'MKCOL':
             cal.makeCalendar(request);
             break;
 

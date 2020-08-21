@@ -19,6 +19,8 @@
     "url": "https://github.com/LordEidi/fennel/issues"
   },
   "scripts": {
+    "web": "parcel index.html --public-url /dist",
+    "serve": "nodemon server.js",
     "test": "tape test/**/*.js | faucet"
   },
   "homepage": "https://github.com/LordEidi/fennel",
@@ -27,24 +29,36 @@
     "url": "https://github.com/LordEidi/fennel.git"
   },
   "dependencies": {
+    "@fullcalendar/core": "^5.3.0",
+    "@fullcalendar/daygrid": "^5.3.0",
+    "@fullcalendar/react": "^5.3.0",
+    "@fullcalendar/timegrid": "^5.3.0",
+    "calendar-js": "git+https://github.com/georgehrke/calendar-js.git",
+    "cdav-library": "github:nextcloud/cdav-library",
     "crossroads": "^0.12.2",
+    "dav": "^1.8.0",
     "htdigest": "^2.0.2",
     "htpasswd": "^2.1.2",
     "http-auth": "^2.1.9",
-    "libxmljs": "^0.18.0",
+    "libxmljs": "^0.19.7",
     "log4js": "^0.6.9",
     "moment": "^2.15.1",
     "node-regexp": "^0.1.1",
     "pretty-data": "^0.40.0",
-    "sequelize": "^3.30.4",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "sequelize": "^6.3.4",
     "shiro-trie": "^0.3.12",
-    "sqlite3": "^3.0.8",
+    "sqlite3": "^4.2.0",
     "uuid": "^2.0.3",
     "xml2js": "^0.4.9"
   },
   "devDependencies": {
-    "tape": "^4.0.1",
+    "@nextcloud/browserslist-config": "^1.0.0",
+    "faucet": "0.0.1",
+    "nodemon": "^2.0.4",
+    "parcel-bundler": "^1.12.4",
     "request": "^2.65.0",
-    "faucet": "0.0.1"
+    "tape": "^4.0.1"
   }
 }

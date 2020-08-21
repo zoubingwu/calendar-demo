@@ -126,7 +126,7 @@ function _getPermission(user)
 sequelize.sync().then(function()
     {
         log.info("Database structure updated");
-    }).error(function(error)
+    }).catch(function(error)
     {
         log.error("Database structure update crashed: " + error);
     }

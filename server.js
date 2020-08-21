@@ -28,6 +28,7 @@
  ** $Id:
  **
 -----------------------------------------------------------------------------*/
+var fs = require('fs');
 var config = require('./config').config;
 var authlib = require('./libs/authentication');
 var http = require('http');
@@ -44,10 +45,9 @@ crossroads.ignoreState = true;
 var basic = httpauth.basic(
     {
         realm: "Fennel"
-    }, function (username, password, callback)
-    {
-        authlib.checkLogin(basic, username, password, callback);
-    }
+    }, function (username, password, callback) {
+    authlib.checkLogin(basic, username, password, callback);
+}
 );
 
 /**
@@ -55,8 +55,7 @@ var basic = httpauth.basic(
  * @param comm
  * @param path
  */
-function onBypass(comm, path)
-{
+function onBypass(comm, path) {
     log.info('URL unknown: ' + path);
 
     var res = comm.getRes();
@@ -70,8 +69,7 @@ function onBypass(comm, path)
  * Gets called when the / URL is hit
  * @param comm
  */
-function onHitRoot(comm)
-{
+function onHitRoot(comm) {
     log.debug("Called the root. Redirecting to /p/");
 
     comm.getRes().writeHead(302,
@@ -79,19 +77,26 @@ function onHitRoot(comm)
             'Location': '/p/'
             //todo: add other headers here...?
         });
+
+
     comm.flushResponse();
 }
 
-function onHitWellKnown(comm, params)
-{
+function onHitWellKnown(comm, params) {
     log.debug("Called .well-known URL for " + params + ". Redirecting to /p/");
+    console.log(1111111, comm.getRes().getHeaders())
 
-    comm.getRes().writeHead(302,
-        {
-            'Location': '/p/'
-            //todo: add other headers here...?
-        });
-    comm.flushResponse();
+    comm.res.writeHead(302, {
+        'Location': '/p/',
+    })
+    // comm.getRes().writeHead(302,
+    //     {
+    //         'Location': '/p/'
+    //         //todo: add other headers here...?
+    //     });
+    comm.res.end();
+    console.log(22222, comm.getRes().getHeaders());
+    // comm.flushResponse();
 }
 
 /**
@@ -99,13 +104,13 @@ function onHitWellKnown(comm, params)
  * @param comm
  * @param params
  */
-function onHitPrincipal(comm, params)
-{
+function onHitPrincipal(comm, params) {
+    log.debug("Called /p/");
+
     comm.params = params;
 
     // check authorisation
-    if(!comm.checkPermission(comm.getURL(), comm.getReq().method))
-    {
+    if (!comm.checkPermission(comm.getURL(), comm.getReq().method)) {
         var res = comm.getRes();
         log.info("Request is denied to this user");
         res.writeHead(403);
@@ -123,19 +128,18 @@ function onHitPrincipal(comm, params)
  * @param cal
  * @param params
  */
-function onHitCalendar(comm, username, cal, params)
-{
+function onHitCalendar(comm, username, cal, params) {
     comm.username = username;
     comm.cal = cal;
     comm.params = params;
 
     // check authorisation
-    if(!comm.checkPermission(comm.getURL(), comm.getReq().method))
-    {
+    if (!comm.checkPermission(comm.getURL(), comm.getReq().method)) {
         var res = comm.getRes();
         log.info("Request is denied to this user");
         res.writeHead(403);
         res.write("Request is denied to this user");
+        res.end();
         return;
     }
 
@@ -149,15 +153,13 @@ function onHitCalendar(comm, username, cal, params)
  * @param card
  * @param params
  */
-function onHitCard(comm, username, card, params)
-{
+function onHitCard(comm, username, card, params) {
     comm.username = username;
     comm.card = card;
     comm.params = params;
 
     // check authorisation
-    if(!comm.checkPermission(comm.getURL(), comm.getReq().method))
-    {
+    if (!comm.checkPermission(comm.getURL(), comm.getReq().method)) {
         var res = comm.getRes();
         log.info("Request is denied to this user");
         res.writeHead(403);
@@ -168,28 +170,38 @@ function onHitCard(comm, username, card, params)
     handler.handleCard(comm);
 }
 
+function onHitHome({ req, res }) {
+    log.info("hit " + req.url);
+    fs.readFile(__dirname + req.url, function (err, data) {
+        if (err) {
+            res.writeHead(404);
+            res.end(JSON.stringify(err));
+            return;
+        }
+        res.writeHead(200);
+        res.end(data);
+    });
+}
+
 crossroads.addRoute('/p/:params*:', onHitPrincipal);
 crossroads.addRoute('/cal/:username:/:cal:/:params*:', onHitCalendar);
 crossroads.addRoute('/card/:username:/:card:/:params*:', onHitCard);
 crossroads.addRoute('/.well-known/:params*:', onHitWellKnown);
 crossroads.addRoute('/', onHitRoot);
-crossroads.bypassed.add(onBypass);
+crossroads.bypassed.add(onHitHome);
 
 // start the server and process requests
-var server = http.createServer(basic, function (req, res)
-{
+var server = http.createServer(basic, function (req, res) {
     log.debug("Method: " + req.method + ", URL: " + req.url);
 
     // will contain the whole body submitted
-	var reqBody = "";
+    var reqBody = "";
 
-    req.on('data', function (data)
-    {
+    req.on('data', function (data) {
         reqBody += data.toString();
     });
 
-    req.on('end',function()
-    {
+    req.on('end', function () {
         var comm = new communication(req, res, reqBody);
 
         var sUrl = url.parse(req.url).pathname;
@@ -200,14 +212,12 @@ var server = http.createServer(basic, function (req, res)
 
 server.listen(config.port);
 
-server.on('error', function (e)
-{
+server.on('error', function (e) {
     log.warn('Caught error: ' + e.message);
     log.debug(e.stack);
 });
 
-process.on('uncaughtException', function(err)
-{
+process.on('uncaughtException', function (err) {
     log.warn('Caught exception: ' + err.message);
     log.debug(err.stack);
 });
