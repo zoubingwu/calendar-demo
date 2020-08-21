@@ -20,6 +20,7 @@
   },
   "scripts": {
     "web": "parcel index.html --public-url /dist",
+    "build:web": "parcel build index.html --public-url /dist",
     "serve": "nodemon server.js",
     "test": "tape test/**/*.js | faucet"
   },
